@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import *
 from flask_marshmallow import Marshmallow
@@ -15,26 +15,38 @@ app.config.from_object(__name__)
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
-CORS(app, resources={r'/*': {'origins': '*'}})
+CORS(app, resources={r"/api/*": {"origins": "*", "allow_headers": "*", "expose_headers": "*"}})
+PRODUCTS = []
 
-
-class Prodotto(db.Model):
+class Product(db.Model):
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    nome = db.Column(db.VARCHAR(255))
-    comprato = db.Column(db.VARCHAR(5))
+    name = db.Column(db.VARCHAR(255))
+    bought = db.Column(db.Boolean)
 
 
-class ProdottoSchema(ma.SQLAlchemyAutoSchema):
+class ProductSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
-        model = Prodotto
+        model = Product
         load_istance = True
+
+
+@app.route('/api/product/<productID>', methods=['PUT', 'DELETE'])
+def product(productID):
+    if request.method == 'PUT':
+        product = Product.query.filter_by(id=productID).first()
+        product.bought = not product.bought
+        db.session.merge(product)
+        db.session.commit()
+        db.session.refresh(product)
+        return product
+
 
 @app.route('/', methods=['GET'])
 def getData():
-    query = Prodotto.query.all()
-    prodottiSchema = ProdottoSchema(many = True)
-    prodotti = prodottiSchema.dump(query)
-    return jsonify(prodotti)
+    query = Product.query.all()
+    productsSchema = ProductSchema(many = True)
+    products = productsSchema.dump(query)
+    return jsonify(products)
 
 
 

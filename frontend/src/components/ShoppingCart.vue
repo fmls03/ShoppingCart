@@ -3,6 +3,7 @@
         <div id="div-title">
             <p id="title">Carrello della spesa</p>
         </div>
+        <form @submit.prevent="submit">
         <table class="table">
             <tr>
                 <th id="columns">Prodotto</th>
@@ -10,11 +11,13 @@
             </tr>
 
             <tr v-for="(product, index) in products" :key="index" >
-                <th v-bind:class="{ 'isBought': isActive, 'notBought': !isActive}">{{ product.nome }}</th>                    
-                <th><input type="checkbox" name="comprato" id="comprato" v-on:change="isBought(product)"
+                <th v-bind:class="{ 'isBought': isActive, 'notBought': !isActive}">{{ product.name }}</th>    
+                <th>{{ product.bought }}</th>                
+                <th><input type="checkbox" name="comprato" id="comprato" v-on:change="isBought(product.id)"
                 ></th>
             </tr>
         </table>
+        </form>
     </div>
 </template>
 
@@ -28,22 +31,39 @@ export default {
         return {
             isActive: false,
             textDec: 'bought',
-            products: []
+            products: [],
         };
     },
     methods: {
         async getProducts() {
-            let response = await axios.get('http://localhost:5000/');
-            this.products = response.data;
-            console.log(products)
-            .catch((error) => {
-            console.error(error);
-        });
+            try{
+                let response = await axios.get('http://localhost:5000/');
+                this.products = response.data;
+                console.log(this.products)
+ 
+            }
+            catch(ex){
+                console.error(ex);
+            }
         },
-        isBought(product){
+        isBought(productID){
             this.isActive = !this.isActive;
-            this.product.comprato = !this.product.comprato
-            
+            let product=this.products.find(product=>product.id===productID);
+            if(product){
+                const data = {
+    		        bought: !product.bought
+    	        };
+                console.log('Aggiornamento: ',product);
+                axios.put(`http://localhost:5000/api/products/${productID}`, data)
+                .then(response => {console.log(response);
+                });
+                this.getProducts();
+            } 
+            this.isActive = !this.isActive;
+        },
+
+        submit(){
+            axios.put('https://localhost:5000', this.formEdit)
         }
     },
     created() {
