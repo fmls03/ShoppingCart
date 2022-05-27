@@ -17,9 +17,12 @@ ma = Marshmallow(app)
 
 class Product(db.Model):
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    name = db.Column(db.VARCHAR(255))
-    bought = db.Column(db.Boolean)
+    name = db.Column(db.VARCHAR(255), nullable=False)
+    bought = db.Column(db.Boolean, nullable=False)
 
+    def __init__(self, name, bought):
+        self.name = name
+        self.bought = bought
 
 class ProductSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
@@ -27,8 +30,8 @@ class ProductSchema(ma.SQLAlchemyAutoSchema):
         load_istance = True
 
 
-@app.route('/api/products/bought/<productID>', methods=['PUT', 'DELETE'])
-def product(productID):
+@app.route('/api/product/bought/<productID>', methods=['PUT'])
+def buyProduct(productID):
     if request.method == 'PUT':
         product = Product.query.filter_by(id=productID).first()
         payload = request.get_json()
@@ -40,6 +43,28 @@ def product(productID):
         products_json = productsSchema.dump(product)        
         return jsonify(products_json)
 
+@app.route('/api/product/add', methods=['PUT'])
+def addProduct():
+    if request.method == 'PUT':
+        payload = request.get_json()
+        print(payload.get('name'))
+        name = payload.get('name')
+        newProduct = Product(name, False)
+        db.session.add(newProduct)
+        db.session.commit()
+        db.session.refresh(newProduct)
+        productSchema = ProductSchema()
+        product_json = productSchema.dump(newProduct)
+        return jsonify(product_json)
+
+
+@app.route('/api/product/delete/<productID>', methods=['DELETE'])
+def deleteProduct(productID):
+    if request.method == 'DELETE':
+        Product.query.filter_by(id = productID).delete()
+        db.session.commit()
+        return jsonify('deleted')
+            
 
 @app.route('/api/', methods=['GET'])
 def getData():

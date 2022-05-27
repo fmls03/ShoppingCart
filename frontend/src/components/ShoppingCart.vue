@@ -3,7 +3,6 @@
         <div id="div-title">
             <p id="title">Carrello della spesa</p>
         </div>
-        <form @submit.prevent="submit">
         <table class="table">
             <tr>
                 <th id="columns">Prodotto</th>
@@ -13,7 +12,8 @@
             <tr v-for="(product, index) in products" :key="index" >
                 <th v-if="product.bought === false">{{ product.name }}</th>
                 <th v-else style="text-decoration: line-through;">{{ product.name }}</th>
-                <th><input type="checkbox" name="comprato" id="comprato" v-on:change="isBought(product.id)" v-model="product.bought" ></th>
+                <th><input type="checkbox" name="bought" id="bought-checkbox" v-on:change="isBought(product.id)" v-model="product.bought" ></th>
+                <th id="delete-column"><input type="button" name="delete" id="delete-btn" v-on:click="deleteProduct(product.id)"></th>
             </tr>
         </table>
 
@@ -22,7 +22,6 @@
             <input type="text" name="add-product" id="add-product" placeholder="Add product" v-model="newName">
             <input type="button" name="btn-add-product" id="btn-add-product" value="Add" v-on:click="addProduct">
         </div>
-        </form>
     </div>
 </template>
 
@@ -53,23 +52,40 @@ export default {
                 console.error(ex);
             }
         },
+
+
         async isBought(productID){
             this.isActive = !this.isActive;
             let product=this.products.find(product=>product.id===productID);
             if(product){
-                const data = {
+                const payload = {
     		        bought: !product.bought
     	        };
                 console.log('Aggiornamento: ',product);
-                await axios.put(`/api/products/bought/${productID}`, data)
+                await axios.put(`/api/product/bought/${productID}`, payload)
                 .then(response => {console.log(response);
                 });
                 this.getProducts();
             }},
+
+
         async addProduct(){
-            const data = {
-                newName: this.newName
-                //await axios.put('http')
+            const payload = {
+                name: this.newName
+            }
+            await axios.put('/api/product/add', payload)
+            .then(response => {console.log(response);
+            }),
+            this.getProducts();
+        },
+
+        async deleteProduct(productID){
+            let product = this.products.find(product=>product.id===productID);
+            if(product){
+                await axios.delete(`/api/product/delete/${productID}`)
+                .then(response => {console.log(response);
+                });
+                this.getProducts();
             }
         }
 
@@ -135,6 +151,7 @@ th{
     align-items: center;
     margin-top: 20px;
     height: 30px;
+    width: 430px;
 }
 
 #text-add-product{
@@ -150,7 +167,13 @@ th{
     background-color: aliceblue;
     color:black;
     outline: none;
+    opacity: 0.7;
     text-decoration: none;;
+}
+
+#add-product:hover{
+    border-color: cornflowerblue;
+    box-shadow: 0 0 5px cornflowerblue;
 }
 
 #btn-add-product{
@@ -168,5 +191,24 @@ th{
     opacity: 1;
     border-color: cornflowerblue;
     box-shadow: 0 0 5px cornflowerblue;
+}
+
+#delete-column{
+    width: 20px;
+}
+
+#delete-btn{
+    height: 12px;
+    width: 12px;
+    border-radius: 20px;
+    border: 0;
+    text-align: center;
+    background-color: red;
+    opacity: 0.8;
+}
+
+#delete-btn:hover{
+    border-color: darkred;
+    box-shadow: 0 0 5px red;
 }
 </style>
