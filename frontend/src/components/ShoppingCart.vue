@@ -13,10 +13,15 @@
             <tr v-for="(product, index) in products" :key="index" >
                 <th v-if="product.bought === false">{{ product.name }}</th>
                 <th v-else style="text-decoration: line-through;">{{ product.name }}</th>
-                <th><input type="checkbox" name="comprato" id="comprato" v-on:change="isBought(product.id)" v-model="product.bought" 
-                ></th>
+                <th><input type="checkbox" name="comprato" id="comprato" v-on:change="isBought(product.id)" v-model="product.bought" ></th>
             </tr>
         </table>
+
+        <div id="div-add-product">
+            <p id="text-add-product">Add product:</p>
+            <input type="text" name="add-product" id="add-product" placeholder="Add product" v-model="newName">
+            <input type="button" name="btn-add-product" id="btn-add-product" value="Add" v-on:click="addProduct">
+        </div>
         </form>
     </div>
 </template>
@@ -32,12 +37,14 @@ export default {
             isActive: false,
             textDec: 'bought',
             products: [],
+            newName: ''
+            
         };
     },
     methods: {
         async getProducts() {
             try{
-                let response = await axios.get('http://localhost:8080/api/');
+                let response = await axios.get('/api/');
                 this.products = response.data;
                 console.log(this.products)
  
@@ -54,11 +61,17 @@ export default {
     		        bought: !product.bought
     	        };
                 console.log('Aggiornamento: ',product);
-                await axios.put(`http://localhost:8080/api/products/bought/${productID}`, data)
+                await axios.put(`/api/products/bought/${productID}`, data)
                 .then(response => {console.log(response);
                 });
                 this.getProducts();
-            }         },
+            }},
+        async addProduct(){
+            const data = {
+                newName: this.newName
+                //await axios.put('http')
+            }
+        }
 
     },
     created() {
@@ -114,13 +127,46 @@ th{
 
 }
 
-.isBought{
-    text-decoration: line-through;
+#div-add-product{
+    background-color: rgb(150, 150, 150, 0.6);
+    border-radius: 5px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 20px;
+    height: 30px;
 }
 
-.notBought{
-    text-decoration: none;
+#text-add-product{
+    font-weight: bold;
+    font-size: small;
+    margin-right: 20px;
+    margin-left: 50px;
 }
 
+#add-product{
+    margin-right: 20px;
+    border-radius: 4px;
+    background-color: aliceblue;
+    color:black;
+    outline: none;
+    text-decoration: none;;
+}
 
+#btn-add-product{
+    width: 50px;
+    border-radius: 4px;
+    border: 2px;
+    background-color:dodgerblue;
+    font-size: smaller;
+    font-weight: bold;
+    opacity: 0.8px;
+    height: 15px;
+}
+
+#btn-add-product:hover{
+    opacity: 1;
+    border-color: cornflowerblue;
+    box-shadow: 0 0 5px cornflowerblue;
+}
 </style>
