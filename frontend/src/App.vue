@@ -14,7 +14,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-family: "Trebuchet MS", "sans-serif";
+  font-family: "Courier New Lucida Console Monaco", "Monospace";
 }
 
 #app{

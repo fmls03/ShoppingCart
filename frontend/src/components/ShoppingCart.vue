@@ -11,9 +11,9 @@
             </tr>
 
             <tr v-for="(product, index) in products" :key="index" >
-                <th v-bind:class="{ 'isBought': isActive, 'notBought': !isActive}">{{ product.name }}</th>    
-                <th>{{ product.bought }}</th>                
-                <th><input type="checkbox" name="comprato" id="comprato" v-on:change="isBought(product.id)"
+                <th v-if="product.bought === false">{{ product.name }}</th>
+                <th v-else style="text-decoration: line-through;">{{ product.name }}</th>
+                <th><input type="checkbox" name="comprato" id="comprato" v-on:change="isBought(product.id)" v-model="product.bought" 
                 ></th>
             </tr>
         </table>
@@ -37,7 +37,7 @@ export default {
     methods: {
         async getProducts() {
             try{
-                let response = await axios.get('http://localhost:5000/');
+                let response = await axios.get('http://localhost:8080/api/');
                 this.products = response.data;
                 console.log(this.products)
  
@@ -46,7 +46,7 @@ export default {
                 console.error(ex);
             }
         },
-        isBought(productID){
+        async isBought(productID){
             this.isActive = !this.isActive;
             let product=this.products.find(product=>product.id===productID);
             if(product){
@@ -54,17 +54,12 @@ export default {
     		        bought: !product.bought
     	        };
                 console.log('Aggiornamento: ',product);
-                axios.put(`http://localhost:5000/api/products/${productID}`, data)
+                await axios.put(`http://localhost:8080/api/products/bought/${productID}`, data)
                 .then(response => {console.log(response);
                 });
                 this.getProducts();
-            } 
-            this.isActive = !this.isActive;
-        },
+            }         },
 
-        submit(){
-            axios.put('https://localhost:5000', this.formEdit)
-        }
     },
     created() {
         this.getProducts();
