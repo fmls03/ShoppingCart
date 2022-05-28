@@ -121,7 +121,7 @@ export default {
     background: -webkit-linear-gradient(0deg, rgba(46,51,56,1) 0%, rgba(60,73,84,1) 100%);
     background: linear-gradient(0deg, rgb(43, 50, 56) 0%, rgb(56, 68, 79) 100%);
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#2e3338",endColorstr="#3c4954",GradientType=1);
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 7px 29px 0px;  
+    box-shadow: rgba(0, 0, 0, 0.5) 0px 7px 29px 0px;  
     color: white;
 }
 
@@ -195,22 +195,23 @@ th{
 }
 
 #btn-add-product{
+    font-weight: bold;
     width: 50px;
     border-radius: 4px;
     border: 2px;
-    background: rgb(58, 76, 84);
+    background: rgb(46 168 42);    
     font-size: smaller;
     opacity: 0.8px;
     height: 15px;
     color: white;
-    box-shadow: rgba(0, 0, 0, 0.4) 0px 7px 29px 0px;  
+    box-shadow: rgba(0, 0, 0, 0.126) 0px 7px 29px 0px;  
 
 }
 
 #btn-add-product:hover{
     opacity: 1;
-    border-color: rgb(128, 169, 244);
-    box-shadow: 0 0 5px rgb(120, 164, 245);
+    border-color: rgb(130, 244, 128);
+    box-shadow: 0 0 5px  rgb(130, 244, 128);
 }
 
 #delete-column{
